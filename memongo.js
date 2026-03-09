@@ -159,7 +159,17 @@ class _JSONObjUtils {
  * Represents a collection of documents in the database, providing methods for querying, manipulating, and managing records
  *
  * @example
- * // See from the `constructor`.
+ * // Create a new collection instance
+ * const users = new Collection(userData, rootDatabase, { orderBy: [{ field: "name", order: "asc" }] });
+ *
+ * @example
+ * // Chain query methods
+ * const results = collection
+ *   .where({ age: { $gt: 18 } })
+ *   .orderBy("name", "asc")
+ *   .limit(10)
+ *   .skip(5)
+ *   .get();
  */
 class _Collection {
   /**
@@ -169,19 +179,6 @@ class _Collection {
    * @param {MemoryJSONDB} root - The root of the collection
    * @param {Object} content - The collection content object where keys are document IDs and values are document contents
    * @param {Object} [options] - Configuration options for query operations
-   *
-   * @example
-   * // Create a new collection instance
-   * const users = new Collection(userData, rootDatabase, { orderBy: [{ field: "name", order: "asc" }] });
-   *
-   * @example
-   * // Chain query methods
-   * const results = collection
-   *   .where({ age: { $gt: 18 } })
-   *   .orderBy("name", "asc")
-   *   .limit(10)
-   *   .skip(5)
-   *   .get();
    */
   constructor(root, content, options = { orderBy: [] }) {
     this.root = root;
@@ -440,7 +437,18 @@ class _Collection {
  * a single document stored inside a `Collection` as its root.
  *
  * @example
- * // See from the `constructor`
+ * const doc = new Document(collectionAsRoot, "user123", { name: "Tom", age: 20 });
+ *
+ * const result = doc.get();
+ * console.log(result.data._id); // "user123"
+ *
+ * await doc.update({
+ *   data: {
+ *     "age": (age) => age + 1
+ *   }
+ * });
+ *
+ * doc.remove();
  */
 class _Document {
   /**
@@ -450,19 +458,6 @@ class _Document {
    * @param {_Collection} root - The root of the document
    * @param {string} id - The unique identifier of this document
    * @param {Object} content - The document's data content
-   * @example
-   * const doc = new Document(collectionAsRoot, "user123", { name: "Tom", age: 20 });
-   *
-   * const result = doc.get();
-   * console.log(result.data._id); // "user123"
-   *
-   * await doc.update({
-   *   data: {
-   *     "age": (age) => age + 1
-   *   }
-   * });
-   *
-   * doc.remove();
    */
   constructor(root, id, content) {
     this.root = root;
@@ -519,6 +514,10 @@ class _Document {
 
 /**
  * Represents a command used to evaluate a condition.
+ *
+ * @example
+ * const isPositive = new Command(v => v > 0);
+ * isPositive.exec(5); // true
  */
 class _Command {
   /**
@@ -526,10 +525,6 @@ class _Command {
    *
    * @param {(value: any) => boolean} func - Evaluation function.
    * The function receives a value to test and must return `true` or `false`.
-   *
-   * @example
-   * const isPositive = new Command(v => v > 0);
-   * isPositive.exec(5); // true
    */
   constructor(func) {
     this.exec = func;
@@ -563,7 +558,41 @@ class _Command {
  * @class
  *
  * @example
- * // See from the `constructor`.
+ * // In Wechat Miniprogram, using local storage as the persistant method
+ * const db = new MemoryJSONDB(
+ *   async () => {
+ *     try {
+ *       return (await wx.getStorage({ key: "localDB" })).data;
+ *     } catch {
+ *       return {};
+ *     }
+ *   },
+ *   async (jsonObj, resolve, reject) => {
+ *     wx.setStorage({
+ *       key: "localDB",
+ *       data: jsonObj,
+ *       success: resolve,
+ *       fail: reject,
+ *     });
+ *   },
+ * );
+ * await db.init();
+ *
+ * const users = await db.createCollection("users");
+ *
+ * @example
+ * // The persistant storage stores the JSON string
+ * const db = new MemoryJSONDB(
+ *   async () => JSON.parse(localStorage.getItem("db")),
+ *   async (data, resolve, reject) => {
+ *     try {
+ *       localStorage.setItem("db", JSON.stringify(data));
+ *       resolve();
+ *     } catch (err) {
+ *       reject(err);
+ *     }
+ *   }
+ * );
  */
 class MemoryJSONDB {
   _memoryJSONDB = null;
@@ -575,43 +604,6 @@ class MemoryJSONDB {
    * @param {() => Promise<Object>} getJSONObj Function that returns the persisted JSON object.
    *
    * @param {(jsonObj, resolve, reject) => Promise<void>} writeJSONObj Function that writes the JSON object to persistent storage.
-   *
-   * @example
-   * // In Wechat Miniprogram, using local storage as the persistant method
-   * const db = new MemoryJSONDB(
-   *   async () => {
-   *     try {
-   *       return (await wx.getStorage({ key: "localDB" })).data;
-   *     } catch {
-   *       return {};
-   *     }
-   *   },
-   *   async (jsonObj, resolve, reject) => {
-   *     wx.setStorage({
-   *       key: "localDB",
-   *       data: jsonObj,
-   *       success: resolve,
-   *       fail: reject,
-   *     });
-   *   },
-   * );
-   * await db.init();
-   *
-   * const users = await db.createCollection("users");
-   *
-   * @example
-   * // The persistant storage stores the JSON string
-   * const db = new MemoryJSONDB(
-   *   async () => JSON.parse(localStorage.getItem("db")),
-   *   async (data, resolve, reject) => {
-   *     try {
-   *       localStorage.setItem("db", JSON.stringify(data));
-   *       resolve();
-   *     } catch (err) {
-   *       reject(err);
-   *     }
-   *   }
-   * );
    */
   constructor(getJSONObj, writeJSONObj) {
     this._getJSONObj = getJSONObj;
