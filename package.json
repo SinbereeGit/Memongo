@@ -3,6 +3,13 @@
   "version": "1.0.0",
   "description": "A minimal MongoDB-like in-memory JSON database with pluggable persistence.",
   "main": "memongo.js",
+  "files": [
+    "memongo.js",
+    "README.md",
+    "README_zh-CN.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "docs": "jsdoc -c jsdoc.json"

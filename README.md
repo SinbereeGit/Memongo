@@ -1,6 +1,10 @@
 <div align="center">
 
+<img src="docs/assets/logo.png" width="120" alt="Memongo Logo"/>
+
 # Memongo
+
+**English** · [简体中文](./README_zh-CN.md)
 
 ![license](https://img.shields.io/badge/license-GPLv3-blue)
 ![javascript](https://img.shields.io/badge/language-JavaScript-yellow)
@@ -8,7 +12,7 @@
 ![npm version](https://img.shields.io/npm/v/memongo)
 ![stars](https://img.shields.io/github/stars/SinbereeGit/memongo)
 
-**English** · [简体中文](./README_zh-CN.md)
+<img src="docs/assets/banner.png" width="600" alt="Memongo Banner"/>
 
 </div>
 
