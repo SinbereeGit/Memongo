@@ -4,7 +4,8 @@
   "description": "A minimal MongoDB-like in-memory JSON database with pluggable persistence.",
   "main": "memongo.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "docs": "jsdoc -c jsdoc.json"
   },
   "keywords": [
     "database",
@@ -23,5 +24,9 @@
   "homepage": "https://github.com/SinbereeGit/memongo",
   "bugs": {
     "url": "https://github.com/SinbereeGit/memongo/issues"
+  },
+  "devDependencies": {
+    "docdash": "^2.0.2",
+    "jsdoc": "^4.0.5"
   }
 }
