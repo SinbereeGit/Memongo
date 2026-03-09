@@ -261,6 +261,8 @@ await users.remove();
 
 ## Example: WeChat Mini Program Persistence
 
+In this way, one can still use `wx.getStorage` and `wx.setStorage` as long as they avoid accessing the specific key `"localDB"`. The maximum size of the database is then 1 MB, as WeChat Mini Program allows only 1 MB of storage per key (for details about this, refer to the [official WeChat Mini Program documentation](https://developers.weixin.qq.com/miniprogram/dev/api/storage/wx.setStorage.html)).
+
 ```javascript
 const db = new MemoryJSONDB(
   async () => {
@@ -280,6 +282,54 @@ const db = new MemoryJSONDB(
   },
 );
 ```
+
+The following is a solution to fully utilize the entire 10 MB of local storage. In this approach, access to local storage must be restricted solely to this database API; otherwise, unpredictable results may occur.
+
+```javascript
+const db = new MemoryJSONDB(
+  async () => {
+    const memoryJSONDB = {};
+    await Promise.all(
+      (await wx.getStorageInfo()).keys.map(async (key) => {
+        memoryJSONDB[key] = (await wx.getStorage({ key })).data;
+      }),
+    );
+    return memoryJSONDB;
+  },
+  async (jsonObj, resolve, reject) => {
+    Promise.all(
+      Object.keys(jsonObj).map(async (key) => {
+        await wx
+          .setStorage({
+            key: key,
+            data: jsonObj[key],
+          })
+          .then(resolve)
+          .catch(reject);
+      }),
+    );
+  },
+);
+```
+
+To implement either of the above approaches, it is best to do the following wrapping in a separate JS file (e.g., `localDB.js`) as demonstrated below, and always interact with the database through this file.
+
+```javascript
+// In localDB.js file
+
+const { MemoryJSONDB, LOCALDB_ERROR_TYPES } = require("../memongo"); // Or the right path to require
+
+// Either of the above two way
+// ...
+
+module.exports = {
+  db,
+  command: MemoryJSONDB.command,
+  LOCALDB_ERROR_TYPES,
+};
+```
+
+In this way, one can ensure that there is only one instance of the database, thereby avoiding any inconsistency issues that might arise from running multiple instances without carefully handling data consistency.
 
 ---
 

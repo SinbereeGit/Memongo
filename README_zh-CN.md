@@ -264,6 +264,8 @@ await users.remove();
 
 ## 示例：微信小程序持久化
 
+通过这种方式，只要避免访问特定的 key `"localDB"`，仍然可以使用 `wx.getStorage` 和 `wx.setStorage`。数据库的最大容量为 1 MB，因为微信小程序对每个 key 只允许 1 MB 的存储空间（具体可参考 [微信小程序官方文档](https://developers.weixin.qq.com/miniprogram/dev/api/storage/wx.setStorage.html)）。
+
 ```javascript
 const db = new MemoryJSONDB(
   async () => {
@@ -283,6 +285,54 @@ const db = new MemoryJSONDB(
   },
 );
 ```
+
+以下是一种方案，可充分利用整个 10 MB 的本地存储。在这种方式下，本地存储的访问必须仅通过此数据库 API 进行，否则可能会出现不可预期的结果。
+
+```javascript
+const db = new MemoryJSONDB(
+  async () => {
+    const memoryJSONDB = {};
+    await Promise.all(
+      (await wx.getStorageInfo()).keys.map(async (key) => {
+        memoryJSONDB[key] = (await wx.getStorage({ key })).data;
+      }),
+    );
+    return memoryJSONDB;
+  },
+  async (jsonObj, resolve, reject) => {
+    Promise.all(
+      Object.keys(jsonObj).map(async (key) => {
+        await wx
+          .setStorage({
+            key: key,
+            data: jsonObj[key],
+          })
+          .then(resolve)
+          .catch(reject);
+      }),
+    );
+  },
+);
+```
+
+要实现上述任一方法，最好像下面示例那样，在一个单独的 JS 文件中（例如 `localDB.js`）进行封装，并始终通过该文件与数据库进行交互。
+
+```javascript
+// 在 localDB.js 文件中
+
+const { MemoryJSONDB, LOCALDB_ERROR_TYPES } = require("../memongo"); // 或者使用正确的 require 路径
+
+// 上述两种方式中的任意一种
+// ...
+
+module.exports = {
+  db,
+  command: MemoryJSONDB.command,
+  LOCALDB_ERROR_TYPES,
+};
+```
+
+通过这种方式，可以确保数据库只有一个实例，从而避免因运行多个实例而未仔细处理数据一致性而可能产生的不一致问题。
 
 ---
 
