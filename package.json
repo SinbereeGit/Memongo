@@ -1,6 +1,6 @@
 {
   "name": "memongo",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "description": "A minimal MongoDB-like in-memory JSON database with pluggable persistence.",
   "main": "memongo.js",
   "files": [
@@ -26,7 +26,7 @@
   "license": "GPL-3.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/SinbereeGit/memongo.git"
+    "url": "git+https://github.com/SinbereeGit/memongo.git"
   },
   "homepage": "https://github.com/SinbereeGit/memongo",
   "bugs": {
