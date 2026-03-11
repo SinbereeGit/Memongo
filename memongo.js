@@ -5,7 +5,7 @@
  *
  * @tutorial https://github.com/SinbereeGit/Memongo
  * @author Sinber (https://github.com/SinbereeGit)
- * @license GNU GPL v3 (https://www.gnu.org/licenses/gpl-3.0.html)
+ * @license MIT
  *
  * @description
  * Provides a MongoDB-like API for manipulating JSON data stored in memory with persistence capabilities through user-provided read/write functions.

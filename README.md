@@ -6,7 +6,7 @@
 
 **English** · [简体中文](./README_zh-CN.md)
 
-![license](https://img.shields.io/badge/license-GPLv3-blue)
+![license](https://img.shields.io/badge/license-MIT-blue)
 ![javascript](https://img.shields.io/badge/language-JavaScript-yellow)
 ![repo size](https://img.shields.io/github/repo-size/SinbereeGit/memongo)
 ![npm version](https://img.shields.io/npm/v/memongo)
@@ -351,4 +351,6 @@ Thanks to the following open-source projects:
 
 ## License
 
-Licensed under [GNU GPL v3](https://github.com/SinbereeGit/Memongo/LICENCE).
+> This project was previously licensed under GPL-3.0 and is now relicensed under MIT.
+
+Licensed under [MIT](https://github.com/SinbereeGit/Memongo/LICENCE).

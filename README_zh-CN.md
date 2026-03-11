@@ -6,7 +6,7 @@
 
 [English](./README.md) · **简体中文**
 
-![license](https://img.shields.io/badge/license-GPLv3-blue)
+![license](https://img.shields.io/badge/license-MIT-blue)
 ![javascript](https://img.shields.io/badge/language-JavaScript-yellow)
 ![repo size](https://img.shields.io/github/repo-size/SinbereeGit/memongo)
 ![npm version](https://img.shields.io/npm/v/memongo)
@@ -354,4 +354,6 @@ module.exports = {
 
 ## 许可证
 
-基于 [GNU GPL v3](https://github.com/SinbereeGit/Memongo/LICENCE) 开源许可发布。
+> 这个项目之前采用 GPL-3.0 许可，现已重新授权为 MIT 许可。
+
+基于 [MIT](https://github.com/SinbereeGit/Memongo/LICENCE) 开源许可发布。
