@@ -16,6 +16,14 @@
  *
  * @warning
  * If an exception occurs or is ignored during an operation, you must call `init()` again before using it again, or something bad and unpredicatable may happen.
+ * 
+ * @acknowledgements
+ * Portions of the implementation are derived from MpLocalDB
+ * (https://github.com/jin-yufeng/MpLocalDB),
+ * which is licensed under the MIT License.
+ *
+ * Original copyright:
+ * Copyright (c) 2020 jin-yufeng
  */
 
 // Some defination:
