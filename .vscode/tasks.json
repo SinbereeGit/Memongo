@@ -32,6 +32,24 @@
       "presentation": {
         "focus": true
       }
+    },
+    {
+      "type": "npm",
+      "script": "changeset",
+      "problemMatcher": [],
+      "label": "npm: changeset",
+      "presentation": {
+        "focus": true
+      }
+    },
+    {
+      "type": "npm",
+      "script": "release:prepare",
+      "problemMatcher": [],
+      "label": "npm: release:prepare",
+      "presentation": {
+        "focus": true
+      }
     }
   ]
 }

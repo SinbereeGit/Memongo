@@ -13,7 +13,9 @@
   "scripts": {
     "test": "cross-env TS_NODE_PROJECT=tsconfig.test.json node --import ./scripts/register-ts-node-esm.mjs ./node_modules/mocha/bin/mocha.js",
     "build": "tsc -p tsconfig.build.json",
-    "docs": "typedoc"
+    "docs": "typedoc",
+    "changeset": "changeset",
+    "release:prepare": "changeset version"
   },
   "keywords": [
     "database",
@@ -34,6 +36,7 @@
     "url": "https://github.com/SinbereeGit/memongo/issues"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.30.0",
     "@types/chai": "^5.2.3",
     "@types/mocha": "^10.0.10",
     "chai": "^6.2.2",
