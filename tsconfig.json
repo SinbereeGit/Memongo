@@ -1,13 +1,14 @@
 {
   // Base TypeScript config for the whole project.
   // This file is mainly for the editor/IDE experience
+  "$schema": "https://json.schemastore.org/tsconfig.json",
   "compilerOptions": {
     "target": "ES2022",
     "module": "nodenext",
     "moduleResolution": "NodeNext",
 
     "noEmit": true,
-    "types": ["mocha"],
+    "types": ["mocha", "node"],
 
     "strict": true,
     "noUncheckedIndexedAccess": true,
