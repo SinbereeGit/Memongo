@@ -1,0 +1,8 @@
+{
+  "mochaExplorer.env": {
+    "TS_NODE_PROJECT": "tsconfig.test.json"
+  },
+  "mochaExplorer.nodeArgv": ["--import", "./scripts/register-ts-node-esm.mjs"],
+
+  "testing.automaticallyOpenTestResults": "openOnTestFailure"
+}

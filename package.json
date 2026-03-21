@@ -2,17 +2,18 @@
   "name": "memongo",
   "version": "1.0.3",
   "description": "A minimal MongoDB-like in-memory JSON database with pluggable persistence.",
-  "main": "memongo.js",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "files": [
-    "memongo.js",
+    "dist",
     "README.md",
-    "README_zh-CN.md",
-    "CHANGELOG.md",
     "LICENSE"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "docs": "jsdoc -c jsdoc.json"
+    "test": "cross-env TS_NODE_PROJECT=tsconfig.test.json node --import ./scripts/register-ts-node-esm.mjs ./node_modules/mocha/bin/mocha.js",
+    "build": "tsc -p tsconfig.build.json",
+    "docs": "typedoc"
   },
   "keywords": [
     "database",
@@ -33,7 +34,19 @@
     "url": "https://github.com/SinbereeGit/memongo/issues"
   },
   "devDependencies": {
-    "docdash": "^2.0.2",
-    "jsdoc": "^4.0.5"
+    "@types/chai": "^5.2.3",
+    "@types/mocha": "^10.0.10",
+    "chai": "^6.2.2",
+    "cross-env": "^10.1.0",
+    "mocha": "^11.7.5",
+    "ts-node": "^10.9.2",
+    "typedoc": "^0.28.17",
+    "typescript": "^5.9.3"
+  },
+  "overrides": {
+    "mocha": {
+      "diff": "8.0.3",
+      "serialize-javascript": "7.0.4"
+    }
   }
 }

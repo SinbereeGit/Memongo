@@ -1,0 +1,44 @@
+name: Upload release asset
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-upload:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build package
+        run: npm run build
+
+      - name: Prepare release bundle
+        run: |
+          mkdir -p release/package
+          cp -r dist release/package/
+          cp README.md LICENSE package.json release/package/
+          cd release/package
+          zip -r ../memongo-${{ github.event.release.tag_name }}.zip .
+
+      - name: Upload asset to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release/memongo-${{ github.event.release.tag_name }}.zip
