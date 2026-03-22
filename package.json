@@ -13,7 +13,7 @@
   "scripts": {
     "test": "cross-env TS_NODE_PROJECT=tsconfig.test.json node --import ./scripts/register-ts-node-esm.mjs ./node_modules/mocha/bin/mocha.js",
     "build": "tsc -p tsconfig.build.json",
-    "perf": "cross-env TS_NODE_PROJECT=tsconfig.test.json node --import ./scripts/register-ts-node-esm.mjs ./test/performance/index.perf.ts",
+    "perf": "cross-env TS_NODE_PROJECT=tsconfig.test.json node --import ./scripts/register-ts-node-esm.mjs ./test/performance/tmp.perf.ts",
     "docs": "typedoc",
     "changeset": "changeset",
     "release:prepare": "changeset version"
