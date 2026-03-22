@@ -27,7 +27,7 @@ export interface CollectionQueryOptions {
 }
 
 export interface CollectionRoot {
-  write(): Promise<void>;
+  write(): void;
 }
 
 export type QueryLeaf = JSONValue | RegExp | QueryCommand;
@@ -43,10 +43,12 @@ export interface Collection {
   /**
    * Uses `_id` if provided; otherwise generates one.
    *
+   * This operation is transactional: if it throws, nothing changes.
+   *
    * @throws
    * - {@link DocumentAlreadyExistsError}: If `_id` already exists.
    */
-  add(data: DocumentContentWithOptionalId): Promise<{ _id: string }>;
+  add(data: DocumentContentWithOptionalId): { _id: string };
 
   /**
    * @throws
@@ -81,11 +83,9 @@ export interface Collection {
    *
    * @throws Propagates errors thrown by {@link JSONObjectOps.update}.
    */
-  update(update: JSONUpdate): Promise<void>;
+  update(update: JSONUpdate): void;
 
-  remove(): Promise<void>;
+  remove(): void;
 
-  removeById(id: string): Promise<void>;
-
-  write(): Promise<void>;
+  removeById(id: string): void;
 }

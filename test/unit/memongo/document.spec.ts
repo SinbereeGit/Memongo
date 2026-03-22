@@ -14,11 +14,11 @@ describe(`${MemongoDocument.name}`, function () {
       writeCalls: 0,
       removeByIdCalls: new Array<string>(),
 
-      async write() {
+      write() {
         this.writeCalls++;
       },
 
-      async removeById(id: string) {
+      removeById(id: string) {
         this.removeByIdCalls.push(id);
       },
     };
@@ -180,21 +180,6 @@ describe(`${MemongoDocument.name}`, function () {
       await document.remove();
 
       expect(root.removeByIdCalls).to.deep.equal(["doc9"]);
-    });
-  });
-
-  describe(`${MemongoDocument.prototype.write.name}`, function () {
-    it("delegates writing to root", async function () {
-      const root = createFakeRoot() satisfies DocumentRoot;
-      const content: DocumentContent = {
-        title: "Hello",
-      };
-
-      const document = new MemongoDocument(root, "doc1", content);
-
-      await document.write();
-
-      expect(root.writeCalls).to.equal(1);
     });
   });
 });

@@ -20,7 +20,7 @@ describe(`${MemongoCollection.name}`, function () {
     return {
       writeCalls: 0,
 
-      async write() {
+      write() {
         this.writeCalls++;
       },
     };

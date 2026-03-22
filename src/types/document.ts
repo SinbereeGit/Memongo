@@ -6,8 +6,9 @@ export type DocumentContentWithId = DocumentContent & { _id: string };
 export type DocumentContentWithOptionalId = DocumentContent & { _id?: string };
 
 export interface DocumentRoot {
-  removeById(id: string): Promise<void>;
-  write(): Promise<void>;
+  removeById(id: string): void;
+
+  write(): void;
 }
 
 export interface Document {
@@ -18,9 +19,7 @@ export interface Document {
    *
    * @throws Propagates errors thrown by {@link JSONObjectOps.update}.
    */
-  update(update: JSONUpdate): Promise<void>;
+  update(update: JSONUpdate): void;
 
-  remove(): Promise<void>;
-
-  write(): Promise<void>;
+  remove(): void;
 }

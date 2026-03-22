@@ -28,20 +28,16 @@ export class MemongoDocument implements Document {
     return MemongoDocument.getDocWithId(this._content, this._id);
   }
 
-  async update(update: JSONUpdate): Promise<void> {
+  update(update: JSONUpdate): void {
     const copy = JSONObjectOps.clone(this._content);
 
     JSONObjectOps.update(copy, update);
     JSONObjectOps.update(this._content, update);
 
-    await this.write();
+    this._root.write();
   }
 
-  async remove(): Promise<void> {
-    await this._root.removeById(this._id);
-  }
-
-  async write(): Promise<void> {
-    await this._root.write();
+  remove(): void {
+    this._root.removeById(this._id);
   }
 }

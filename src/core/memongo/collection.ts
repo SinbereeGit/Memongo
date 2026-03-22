@@ -18,6 +18,7 @@ import type {
   DocumentContent,
   DocumentContentWithId,
   DocumentContentWithOptionalId,
+  DocumentRoot,
 } from "../../types/document.js";
 
 import { MemongoDocument } from "./document.js";
@@ -30,7 +31,7 @@ import { isJSONContainer } from "../json/json-guards.js";
 import { JSONObjectOps } from "../json/json-object-ops.js";
 import { MemongoQueryCommand } from "./query-command.js";
 
-export class MemongoCollection implements Collection {
+export class MemongoCollection implements Collection, DocumentRoot {
   _root: CollectionRoot;
   _content: CollectionContent;
   _queryOptions: CollectionQueryOptions;
@@ -45,7 +46,7 @@ export class MemongoCollection implements Collection {
     this._queryOptions = options ?? {};
   }
 
-  async add(data: DocumentContentWithOptionalId): Promise<{ _id: string }> {
+  add(data: DocumentContentWithOptionalId): { _id: string } {
     const generateRandomID = () => {
       let id = "";
       const map =
@@ -64,7 +65,7 @@ export class MemongoCollection implements Collection {
     const id = data._id || generateRandomID();
     this._content[id] = clone;
 
-    await this._root.write();
+    this.write();
 
     return { _id: id };
   }
@@ -204,7 +205,7 @@ export class MemongoCollection implements Collection {
     return res;
   }
 
-  async update(update: JSONUpdate): Promise<void> {
+  update(update: JSONUpdate): void {
     const copy = JSONObjectOps.clone(this._content);
 
     Object.values(copy).forEach((documentContent) =>
@@ -214,24 +215,24 @@ export class MemongoCollection implements Collection {
       JSONObjectOps.update(documentContent, update),
     );
 
-    await this._root.write();
+    this.write();
   }
 
-  async remove(): Promise<void> {
+  remove(): void {
     Object.keys(this._content).forEach((key) => delete this._content[key]);
 
-    await this._root.write();
+    this.write();
   }
 
-  async removeById(id: string): Promise<void> {
+  removeById(id: string): void {
     if (!this._content[id]) throw new DocumentNotExistsError();
 
     delete this._content[id];
 
-    await this._root.write();
+    this.write();
   }
 
-  async write(): Promise<void> {
-    await this._root.write();
+  write(): void {
+    this._root.write();
   }
 }

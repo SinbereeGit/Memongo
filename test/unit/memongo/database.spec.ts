@@ -23,6 +23,7 @@ describe(`${MemongoDatabase.name}`, function () {
     let storedData: DatabaseContent = {};
     return {
       _emitWriteError: false,
+      writeCount: 0,
       enableEmitWriteError() {
         this._emitWriteError = true;
       },
@@ -42,6 +43,7 @@ describe(`${MemongoDatabase.name}`, function () {
           reject(new Error("Failed to write to persistence"));
         } else {
           storedData = JSONObjectOps.clone(dataContent);
+          this.writeCount++;
           resolve();
         }
       },
@@ -55,7 +57,7 @@ describe(`${MemongoDatabase.name}`, function () {
         writeDatabaseContentFunc: (dataContent, resolve, reject) =>
           persistence.write(dataContent, resolve, reject),
       },
-      1, // for testing purposes, set write debounce to 1ms to speed up tests that involve multiple writes
+      1, // for testing purposes, set write debounce default to 1ms to speed up tests that involve multiple writes
     );
     return { db, persistence };
   }
@@ -104,11 +106,12 @@ describe(`${MemongoDatabase.name}`, function () {
       expect(db.collection("users")).to.exist;
     });
 
-    it("writes the new collection to persistence", async function () {
+    it("writes the new collection to persistence asynchronously", async function () {
       const persistence = createFakePersistence();
       const { db } = createDatabase(persistence);
       await db.init();
       await db.createCollection("users");
+      await db.flush();
       const persistedData = await persistence.read();
       expect(persistedData.users).to.exist;
     });
@@ -124,6 +127,7 @@ describe(`${MemongoDatabase.name}`, function () {
           DatabaseNotInitializedError,
         );
 
+        await db.flush();
         const persistedAfter = await persistence.read();
         expect(persistedAfter).to.deep.equal(persistedBefore);
       });
@@ -134,6 +138,7 @@ describe(`${MemongoDatabase.name}`, function () {
         await db.init();
         await db.createCollection("users");
 
+        await db.flush();
         const persistedBefore = await persistence.read();
 
         await expectRejects(
@@ -141,24 +146,10 @@ describe(`${MemongoDatabase.name}`, function () {
           CollectionAlreadyExistsError,
         );
 
+        await db.flush();
         const persistedAfter = await persistence.read();
         expect(persistedAfter).to.deep.equal(persistedBefore);
         await db.createCollection("items");
-      });
-
-      it("write failure resets initialization state and requires re-init", async function () {
-        const { db, persistence } = createDatabase();
-
-        await db.init();
-        persistence.enableEmitWriteError();
-
-        await expectRejects(() => db.createCollection("items"));
-
-        persistence.disableEmitWriteError();
-        await expectRejects(
-          () => db.createCollection("users"),
-          DatabaseNotInitializedError,
-        );
       });
     });
   });
@@ -177,14 +168,16 @@ describe(`${MemongoDatabase.name}`, function () {
       expect(db.collection("users")).to.be.null;
     });
 
-    it("writes the removal to persistence", async function () {
+    it("writes the removal to persistence asynchronously", async function () {
       const { db, persistence } = createDatabase();
 
       await db.init();
       await db.createCollection("users");
+      await db.flush();
       expect(await persistence.read()).to.deep.equal({ users: {} });
 
       await db.removeCollection("users");
+      await db.flush();
       expect((await persistence.read()).users).to.be.undefined;
     });
 
@@ -199,6 +192,7 @@ describe(`${MemongoDatabase.name}`, function () {
           DatabaseNotInitializedError,
         );
 
+        await db.flush();
         const persistedAfter = await persistence.read();
         expect(persistedAfter).to.deep.equal(persistedBefore);
       });
@@ -215,25 +209,9 @@ describe(`${MemongoDatabase.name}`, function () {
           CollectionNotExistsError,
         );
 
+        await db.flush();
         const persistedAfter = await persistence.read();
         expect(persistedAfter).to.deep.equal(persistedBefore);
-      });
-
-      it("write failure resets initialization state and requires re-init", async function () {
-        const { db, persistence } = createDatabase();
-
-        await db.init();
-        await db.createCollection("users");
-
-        persistence.enableEmitWriteError();
-
-        await expectRejects(() => db.removeCollection("users"));
-
-        persistence.disableEmitWriteError();
-        await expectRejects(
-          () => db.createCollection("items"),
-          DatabaseNotInitializedError,
-        );
       });
     });
   });
@@ -266,6 +244,85 @@ describe(`${MemongoDatabase.name}`, function () {
       expect(() => db.collection("users")).to.throw(
         DatabaseNotInitializedError,
       );
+    });
+  });
+
+  describe(`${MemongoDatabase.prototype.write.name}`, function () {
+    it("writes the in-memory database to persistence asynchronously", async function () {
+      const { db, persistence } = createDatabase();
+
+      await db.init();
+      await db.createCollection("users");
+      await db.flush();
+      const persistedData = await persistence.read();
+      expect(persistedData.users).to.exist;
+    });
+
+    it("debounces writes when multiple operations are performed in a short period of time", async function () {
+      const { db, persistence } = createDatabase();
+
+      await db.init();
+      await db.createCollection("users");
+      await db.createCollection("items");
+      await db.createCollection("orders");
+
+      await db.flush();
+      expect(persistence.writeCount).to.equal(1);
+      expect(await persistence.read()).to.deep.equal({
+        users: {},
+        items: {},
+        orders: {},
+      });
+    });
+
+    it("records persistence errors instead of throwing", async function () {
+      const { db, persistence } = createDatabase();
+
+      await db.init();
+      persistence.enableEmitWriteError();
+
+      db.createCollection("users");
+
+      await expectRejects(() => db.flush());
+    });
+  });
+
+  describe(`${MemongoDatabase.prototype.flush.name}`, function () {
+    it("waits for writes to finish", async function () {
+      const { db, persistence } = createDatabase();
+
+      await db.init();
+
+      await db.createCollection("users");
+
+      await db.flush();
+      expect(persistence.writeCount).to.equal(1);
+      expect(await persistence.read()).to.deep.equal({ users: {} });
+    });
+
+    it("throws an AggregateError if there were errors during writes, and resets the database initialization state so it must be initialized again", async function () {
+      const { db, persistence } = createDatabase();
+
+      await db.init();
+
+      await db.createCollection("users");
+
+      await db.flush();
+      expect(await persistence.read()).to.deep.equal({ users: {} });
+
+      persistence.enableEmitWriteError();
+
+      await db.createCollection("items");
+
+      await expectRejects(() => db.flush(), AggregateError);
+
+      await expectRejects(
+        () => db.collection("users"),
+        DatabaseNotInitializedError,
+      );
+
+      await db.init();
+      expect(db.collection("users")).to.exist;
     });
   });
 });

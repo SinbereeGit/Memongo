@@ -13,6 +13,10 @@ export type WriteDatabaseContentFunc = (
   resolve: any,
   reject: any,
 ) => Promise<void>;
+export type Persistence = {
+  readDatabaseContentFunc: ReadDatabaseContentFunc;
+  writeDatabaseContentFunc: WriteDatabaseContentFunc;
+};
 
 export interface Database {
   /**
@@ -21,18 +25,30 @@ export interface Database {
   init(): Promise<void>;
 
   /**
+   * Waits for all pending writes to complete and reports any accumulated errors.
+   *
+   * @remarks
+   * - Resolves only after all scheduled writes have finished.
+   * - If any write errors occurred, they are aggregated and thrown as an `AggregateError`.
+   * - After throwing, the internal error state is cleared and the database is marked as uninitialized.
+   *
+   * @throws {AggregateError} If one or more write operations failed.
+   */
+  flush(): Promise<void>;
+
+  /**
    * @throws
    * - {@link DatabaseNotInitializedError}: When the database is not initialized
    * - {@link CollectionAlreadyExistsError}: When the collection already exists
    */
-  createCollection(name: string): Promise<Collection>;
+  createCollection(name: string): Collection;
 
   /**
    * @throws
    * - {@link DatabaseNotInitializedError}: When the database is not initialized
    * - {@link CollectionNotExistsError}: When the collection does not exist
    */
-  removeCollection(name: string): Promise<void>;
+  removeCollection(name: string): void;
 
   /**
    * @returns returns `null` if the collection does not exist

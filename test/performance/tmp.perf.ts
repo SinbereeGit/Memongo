@@ -42,8 +42,9 @@ async function main() {
 
   await measure("insert 10k", async () => {
     for (const item of data) {
-      await users.add(item);
+      users.add(item);
     }
+    await db.flush();
   });
 
   await measure("query age > 50", async () => {

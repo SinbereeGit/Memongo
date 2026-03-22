@@ -1,8 +1,7 @@
 import type {
   Database,
   DatabaseContent,
-  ReadDatabaseContentFunc,
-  WriteDatabaseContentFunc,
+  Persistence,
 } from "../../types/database.js";
 import type { Collection, CollectionRoot } from "../../types/collection.js";
 
@@ -10,6 +9,7 @@ import {
   CollectionAlreadyExistsError,
   CollectionNotExistsError,
   DatabaseNotInitializedError,
+  PersistenceError,
 } from "../../errors.js";
 import { MemongoCollection } from "./collection.js";
 
@@ -18,46 +18,62 @@ export class MemongoDatabase implements Database, CollectionRoot {
   _memoryJSONDB: DatabaseContent = {};
   _dirty: boolean = false;
   _debounceDelay: number;
-  _readDatabaseContentFunc: ReadDatabaseContentFunc;
-  _writeDatabaseContentFunc: WriteDatabaseContentFunc;
+  _isPureMemoryMode: boolean = false;
+  _persistence: Persistence;
+  _pendingWrites: Promise<void>[] = [];
+  _errorsRecord: Error[] = [];
 
   /**
    * @param persistence - if not provided, the database will be in pure-memory mode
    * @param debounceDelay - delay for debouncing writes to the storage, in milliseconds. Default is 200ms. Ignored in pure-memory mode.
    */
-  constructor(
-    persistence?: {
-      readDatabaseContentFunc: ReadDatabaseContentFunc;
-      writeDatabaseContentFunc: WriteDatabaseContentFunc;
-    },
-    debounceDelay: number = 200,
-  ) {
+  constructor(persistence?: Persistence, debounceDelay: number = 200) {
     if (!persistence) {
       let storedData: DatabaseContent = {};
       persistence = {
         readDatabaseContentFunc: () => Promise.resolve(storedData),
         writeDatabaseContentFunc: () => Promise.resolve(),
       };
-      debounceDelay = 0;
+      this._isPureMemoryMode = true;
     }
 
-    this._readDatabaseContentFunc = persistence.readDatabaseContentFunc;
-    this._writeDatabaseContentFunc = persistence.writeDatabaseContentFunc;
+    this._persistence = persistence;
     this._debounceDelay = debounceDelay;
   }
 
   async init(): Promise<void> {
     if (!this._hasInit) {
-      this._memoryJSONDB = await this._readDatabaseContentFunc();
+      this._memoryJSONDB = await this._persistence.readDatabaseContentFunc();
       this._hasInit = true;
     }
   }
 
+  async flush(): Promise<void> {
+    await Promise.all(this._pendingWrites);
+    if (this._errorsRecord.length > 0) {
+      const errors = this._errorsRecord;
+      this._errorsRecord = [];
+      this._hasInit = false;
+      throw new AggregateError(errors);
+    }
+  }
+
   /**
-   * With debouncing to avoid excessive writes when multiple operations are performed in a short period of time.
+   * Schedules an asynchronous persistence write for the current database state.
    */
-  write(): Promise<void> {
-    if (this._debounceDelay === 0) return Promise.resolve();
+  write(): void {
+    this._pendingWrites.push(this._writeToPersistance());
+  }
+
+  /**
+   * Records any errors that occur during the write process in property {@link _errorsRecord}.
+   *
+   * With debouncing to avoid excessive writes when multiple operations are performed in a short period of time.
+   *
+   * In pure-memory mode, this method resolves immediately without performing any operations.
+   */
+  _writeToPersistance(): Promise<void> {
+    if (this._isPureMemoryMode) return Promise.resolve();
 
     this._dirty = true;
 
@@ -67,40 +83,37 @@ export class MemongoDatabase implements Database, CollectionRoot {
 
         this._dirty = false;
 
-        const wrappedReject = (error: any) => {
-          this._hasInit = false;
-          reject(error);
-        };
-
-        await this._writeDatabaseContentFunc(
+        await this._persistence.writeDatabaseContentFunc(
           this._memoryJSONDB,
           resolve,
-          wrappedReject,
+          reject,
         );
       }, this._debounceDelay);
+    }).catch((e) => {
+      this._errorsRecord.push(new PersistenceError(e));
     });
   }
 
-  async createCollection(name: string): Promise<Collection> {
+  createCollection(name: string): Collection {
     if (!this._hasInit) throw new DatabaseNotInitializedError();
 
     if (this._memoryJSONDB[name]) throw new CollectionAlreadyExistsError(name);
 
     this._memoryJSONDB[name] = {};
 
-    await this.write();
+    this.write();
 
     return new MemongoCollection(this, this._memoryJSONDB[name]);
   }
 
-  async removeCollection(name: string): Promise<void> {
+  removeCollection(name: string): void {
     if (!this._hasInit) throw new DatabaseNotInitializedError();
 
     if (!this._memoryJSONDB[name]) throw new CollectionNotExistsError(name);
 
     delete this._memoryJSONDB[name];
 
-    await this.write();
+    this.write();
   }
 
   collection(name: string): Collection | null {

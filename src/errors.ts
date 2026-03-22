@@ -1,7 +1,13 @@
 export class MemongoError extends Error {
-  constructor(message?: string) {
-    super(message ?? new.target.name);
+  constructor(message?: string, options?: ErrorOptions) {
+    super(message ?? new.target.name, options);
     this.name = new.target.name;
+  }
+}
+
+export class PersistenceError extends MemongoError {
+  constructor(error: unknown) {
+    super("Persistence operation failed", { cause: error });
   }
 }
 
