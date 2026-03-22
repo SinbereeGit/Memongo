@@ -82,7 +82,7 @@ describe(`${MemongoDocument.name}`, function () {
 
       const document = new MemongoDocument(root, "doc1", content);
 
-      await document.update({
+      document.update({
         title: "New",
         "profile.age": 13,
       });
@@ -111,7 +111,7 @@ describe(`${MemongoDocument.name}`, function () {
 
       const document = new MemongoDocument(root, "doc1", content);
 
-      await document.update({
+      document.update({
         title: undefined,
         "profile.name": "Jack Chen",
         "profile.age": (oldAge: number) => oldAge + 1,
@@ -177,7 +177,7 @@ describe(`${MemongoDocument.name}`, function () {
 
       const document = new MemongoDocument(root, "doc9", content);
 
-      await document.remove();
+      document.remove();
 
       expect(root.removeByIdCalls).to.deep.equal(["doc9"]);
     });

@@ -14,8 +14,8 @@ describe(`${MemongoDatabase.name}`, function () {
   it("supports pure-memory mode when no persistence is provided", async function () {
     const db = new MemongoDatabase();
     await db.init();
-    expect(await db.createCollection("users")).to.exist;
-    await db.removeCollection("users");
+    expect(db.createCollection("users")).to.exist;
+    db.removeCollection("users");
     expect(db.collection("users")).to.not.exist;
   });
 
@@ -68,7 +68,7 @@ describe(`${MemongoDatabase.name}`, function () {
 
       await db.init();
 
-      expect(await db.createCollection("users")).to.exist;
+      expect(db.createCollection("users")).to.exist;
     });
 
     it("loads data from persistence into memory during init", async function () {
@@ -92,7 +92,7 @@ describe(`${MemongoDatabase.name}`, function () {
       await db.init();
       await db.init();
 
-      expect(await db.createCollection("users")).to.exist;
+      expect(db.createCollection("users")).to.exist;
     });
   });
 
@@ -102,7 +102,7 @@ describe(`${MemongoDatabase.name}`, function () {
 
       await db.init();
 
-      expect(await db.createCollection("users")).to.exist;
+      expect(db.createCollection("users")).to.exist;
       expect(db.collection("users")).to.exist;
     });
 
@@ -110,7 +110,7 @@ describe(`${MemongoDatabase.name}`, function () {
       const persistence = createFakePersistence();
       const { db } = createDatabase(persistence);
       await db.init();
-      await db.createCollection("users");
+      db.createCollection("users");
       await db.flush();
       const persistedData = await persistence.read();
       expect(persistedData.users).to.exist;
@@ -136,7 +136,7 @@ describe(`${MemongoDatabase.name}`, function () {
         const { db, persistence } = createDatabase();
 
         await db.init();
-        await db.createCollection("users");
+        db.createCollection("users");
 
         await db.flush();
         const persistedBefore = await persistence.read();
@@ -149,7 +149,7 @@ describe(`${MemongoDatabase.name}`, function () {
         await db.flush();
         const persistedAfter = await persistence.read();
         expect(persistedAfter).to.deep.equal(persistedBefore);
-        await db.createCollection("items");
+        db.createCollection("items");
       });
     });
   });
@@ -159,11 +159,11 @@ describe(`${MemongoDatabase.name}`, function () {
       const { db } = createDatabase();
 
       await db.init();
-      await db.createCollection("users");
+      db.createCollection("users");
 
       expect(db.collection("users")).to.exist;
 
-      await db.removeCollection("users");
+      db.removeCollection("users");
 
       expect(db.collection("users")).to.be.null;
     });
@@ -172,11 +172,11 @@ describe(`${MemongoDatabase.name}`, function () {
       const { db, persistence } = createDatabase();
 
       await db.init();
-      await db.createCollection("users");
+      db.createCollection("users");
       await db.flush();
       expect(await persistence.read()).to.deep.equal({ users: {} });
 
-      await db.removeCollection("users");
+      db.removeCollection("users");
       await db.flush();
       expect((await persistence.read()).users).to.be.undefined;
     });
@@ -221,7 +221,7 @@ describe(`${MemongoDatabase.name}`, function () {
       const { db } = createDatabase();
 
       await db.init();
-      await db.createCollection("users");
+      db.createCollection("users");
 
       const collection = db.collection("users");
 
@@ -252,7 +252,7 @@ describe(`${MemongoDatabase.name}`, function () {
       const { db, persistence } = createDatabase();
 
       await db.init();
-      await db.createCollection("users");
+      db.createCollection("users");
       await db.flush();
       const persistedData = await persistence.read();
       expect(persistedData.users).to.exist;
@@ -262,9 +262,9 @@ describe(`${MemongoDatabase.name}`, function () {
       const { db, persistence } = createDatabase();
 
       await db.init();
-      await db.createCollection("users");
-      await db.createCollection("items");
-      await db.createCollection("orders");
+      db.createCollection("users");
+      db.createCollection("items");
+      db.createCollection("orders");
 
       await db.flush();
       expect(persistence.writeCount).to.equal(1);
@@ -293,7 +293,7 @@ describe(`${MemongoDatabase.name}`, function () {
 
       await db.init();
 
-      await db.createCollection("users");
+      db.createCollection("users");
 
       await db.flush();
       expect(persistence.writeCount).to.equal(1);
@@ -305,14 +305,14 @@ describe(`${MemongoDatabase.name}`, function () {
 
       await db.init();
 
-      await db.createCollection("users");
+      db.createCollection("users");
 
       await db.flush();
       expect(await persistence.read()).to.deep.equal({ users: {} });
 
       persistence.enableEmitWriteError();
 
-      await db.createCollection("items");
+      db.createCollection("items");
 
       await expectRejects(() => db.flush(), AggregateError);
 

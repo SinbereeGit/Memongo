@@ -32,7 +32,7 @@ async function main() {
   });
 
   await db.init();
-  const users = await db.createCollection("users");
+  const users = db.createCollection("users");
 
   const data = Array.from({ length: 10_000 }, (_, i) => ({
     test_id: i,
@@ -48,7 +48,7 @@ async function main() {
   });
 
   await measure("query age > 50", async () => {
-    await users.where({ age: _.gt(50) }).get();
+    users.where({ age: _.gt(50) }).get();
   });
 }
 

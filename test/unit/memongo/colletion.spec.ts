@@ -39,11 +39,9 @@ describe(`${MemongoCollection.name}`, function () {
     it("adds the document to the collection and delegates writing to root", async function () {
       const { collection, root } = createCollection();
 
-      const id = (
-        await collection.add({
-          name: "Tom",
-        })
-      )._id;
+      const id = collection.add({
+        name: "Tom",
+      })._id;
 
       expect(collection.get()).to.deep.equal([{ _id: id, name: "Tom" }]);
       expect(root.writeCalls).to.equal(1);
@@ -52,7 +50,7 @@ describe(`${MemongoCollection.name}`, function () {
     it("uses _id if provided, otherwise generates one", async function () {
       const { collection, root } = createCollection();
 
-      const res = await collection.add({
+      const res = collection.add({
         _id: "dqal",
         name: "Tom",
       });
@@ -60,11 +58,9 @@ describe(`${MemongoCollection.name}`, function () {
       expect(res).to.deep.equal({ _id: "dqal" });
       expect(collection.get()).to.deep.equal([{ _id: "dqal", name: "Tom" }]);
 
-      const id = (
-        await collection.add({
-          name: "Jack",
-        })
-      )._id;
+      const id = collection.add({
+        name: "Jack",
+      })._id;
 
       expect(id).to.be.a("string");
       expect(id).to.not.equal("");
@@ -473,7 +469,7 @@ describe(`${MemongoCollection.name}`, function () {
         b: { name: "Jack", status: "active" },
       });
 
-      await collection.update({
+      collection.update({
         status: "inactive",
       });
 
@@ -493,7 +489,7 @@ describe(`${MemongoCollection.name}`, function () {
         b: { profile: { name: "Jack", age: 18, loveLetters: ["c"] } },
       });
 
-      await collection.update({
+      collection.update({
         "profile.name": "Updated",
         "profile.age": (oldAge: number) => oldAge + 1,
         "profile.loveLetters.0": "z",
@@ -543,7 +539,7 @@ describe(`${MemongoCollection.name}`, function () {
         b: { name: "Jack" },
       });
 
-      await collection.remove();
+      collection.remove();
 
       expect(collection.count()).to.equal(0);
       expect(collection.get()).to.deep.equal([]);
@@ -558,7 +554,7 @@ describe(`${MemongoCollection.name}`, function () {
         b: { name: "Jack" },
       });
 
-      await collection.removeById("a");
+      collection.removeById("a");
 
       expect(collection.get()).to.deep.equal([{ _id: "b", name: "Jack" }]);
       expect(root.writeCalls).to.equal(1);
@@ -581,7 +577,7 @@ describe(`${MemongoCollection.name}`, function () {
     it("delegates to root.write", async function () {
       const { collection, root } = createCollection();
 
-      await collection.write();
+      collection.write();
 
       expect(root.writeCalls).to.equal(1);
     });
