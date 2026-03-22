@@ -38,11 +38,11 @@ async function main() {
   await db.init();
 
   let users = db.collection("users");
-  if (!users) users = await db.createCollection("users");
+  if (!users) users = db.createCollection("users");
 
-  await users.add({ name: "Alice", age: 20 });
+  users.add({ name: "Alice", age: 20 });
 
-  await users.add({ name: "Bob", age: 25 });
+  users.add({ name: "Bob", age: 25 });
 
   const res = users
     .where({

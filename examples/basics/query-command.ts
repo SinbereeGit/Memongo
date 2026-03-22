@@ -4,12 +4,12 @@ async function main() {
 	const db = createDatabase();
 	await db.init();
 
-	const users = await db.createCollection("users");
+	const users = db.createCollection("users");
 
-	await users.add({ name: "Alice", age: 18, city: "Shanghai", role: "member" });
-	await users.add({ name: "Bob", age: 27, city: "Beijing", role: "admin" });
-	await users.add({ name: "Cindy", age: 31, city: "Shenzhen", role: "member" });
-	await users.add({ name: "David", age: 15, city: "Shanghai", role: "guest" });
+	users.add({ name: "Alice", age: 18, city: "Shanghai", role: "member" });
+	users.add({ name: "Bob", age: 27, city: "Beijing", role: "admin" });
+	users.add({ name: "Cindy", age: 31, city: "Shenzhen", role: "member" });
+	users.add({ name: "David", age: 15, city: "Shanghai", role: "guest" });
 
 	// Direct value condition.
 	const inShanghai = users.where({ city: "Shanghai" }).get();

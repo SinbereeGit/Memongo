@@ -4,14 +4,14 @@ async function main() {
 	const db = createDatabase();
 	await db.init();
 
-	const products = await db.createCollection("products");
+	const products = db.createCollection("products");
 
-	await products.add({ name: "Keyboard", category: "device", price: 199, sales: 330 });
-	await products.add({ name: "Mouse", category: "device", price: 99, sales: 560 });
-	await products.add({ name: "Monitor", category: "device", price: 999, sales: 120 });
-	await products.add({ name: "USB Cable", category: "accessory", price: 29, sales: 880 });
-	await products.add({ name: "Laptop Stand", category: "accessory", price: 149, sales: 300 });
-	await products.add({ name: "Desk Mat", category: "accessory", price: 49, sales: 520 });
+	products.add({ name: "Keyboard", category: "device", price: 199, sales: 330 });
+	products.add({ name: "Mouse", category: "device", price: 99, sales: 560 });
+	products.add({ name: "Monitor", category: "device", price: 999, sales: 120 });
+	products.add({ name: "USB Cable", category: "accessory", price: 29, sales: 880 });
+	products.add({ name: "Laptop Stand", category: "accessory", price: 149, sales: 300 });
+	products.add({ name: "Desk Mat", category: "accessory", price: 49, sales: 520 });
 
 	// Sort by price descending.
 	const byPriceDesc = products.orderBy("price", "desc").get();

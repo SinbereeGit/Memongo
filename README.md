@@ -47,17 +47,17 @@ async function main() {
   // 2) Create or get a collection.
   let todos = db.collection("todos");
   if (!todos) {
-    todos = await db.createCollection("todos");
+    todos = db.createCollection("todos");
   }
 
   // 3) Add documents.
-  const { _id: buyMilkId } = await todos.add({
+  const { _id: buyMilkId } = todos.add({
     title: "Buy milk",
     done: false,
     priority: 2,
   });
 
-  await todos.add({
+  todos.add({
     title: "Read Memongo docs",
     done: false,
     priority: 1,
@@ -70,17 +70,17 @@ async function main() {
   console.log("One doc:", buyMilk);
 
   // 5) Update one document.
-  await todos.doc(buyMilkId).update({
+  todos.doc(buyMilkId).update({
     done: true,
   });
   console.log("After doc.update:", todos.get());
 
   // 6) Remove one document.
-  await todos.doc(buyMilkId).remove();
+  todos.doc(buyMilkId).remove();
   console.log("After doc.remove:", todos.get());
 
   // 7) Remove all documents in the collection.
-  await todos.remove();
+  todos.remove();
   console.log("After collection.remove:", todos.get());
 }
 

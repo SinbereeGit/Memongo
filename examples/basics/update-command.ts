@@ -4,9 +4,9 @@ async function main() {
 	const db = createDatabase();
 	await db.init();
 
-	const users = await db.createCollection("users");
+	const users = db.createCollection("users");
 
-	const { _id: aliceId } = await users.add({
+	const { _id: aliceId } = users.add({
 		name: "Alice",
 		age: 20,
 		points: 100,
@@ -18,7 +18,7 @@ async function main() {
 		tempField: "to be removed",
 	});
 
-	await users.add({
+	users.add({
 		name: "Bob",
 		age: 24,
 		points: 60,
@@ -31,7 +31,7 @@ async function main() {
 	});
 
 	// Batch update all documents matched by where().
-	await users.where({ profile: { status: "active" } }).update({
+	users.where({ profile: { status: "active" } }).update({
 		age: command.inc(1),
 		points: command.mul(2),
 		tags: command.push("promoted"),
@@ -42,7 +42,7 @@ async function main() {
 	console.log("After collection.update:", users.get());
 
 	// Update one document by id.
-	await users.doc(aliceId).update({
+	users.doc(aliceId).update({
 		tags: command.unshift("top-user"),
 		"profile.status": command.set("legend"),
 		points: command.inc(500),
