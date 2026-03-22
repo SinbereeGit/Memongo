@@ -1,6 +1,6 @@
 {
   "name": "memongo",
-  "version": "1.0.3",
+  "version": "2.0.0",
   "description": "A minimal MongoDB-like in-memory JSON database with pluggable persistence.",
   "type": "module",
   "main": "dist/index.js",

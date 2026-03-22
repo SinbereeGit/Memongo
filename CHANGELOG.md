@@ -1,5 +1,24 @@
 # Changelog
 
+## 2.0.0
+
+### Major Changes
+
+- Rewrite the codebase in TypeScript and introduce unit tests with Mocha + Chai.
+- Redesign the write model:
+  - in-memory updates are now applied synchronously
+  - persistence writes are now executed asynchronously
+  - persistence-related errors are deferred and surfaced via `flush()`
+
+### Minor Changes
+
+- Add performance test.
+
+### Patch Changes
+
+- Add a spec documenting the persistence write order assumption.
+- Clarify the persistence model and update async persistence / `flush()` examples.
+
 ## 1.0.0 - 2026-03-10
 
 ### Major Changes
