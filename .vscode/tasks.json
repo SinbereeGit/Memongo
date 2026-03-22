@@ -50,6 +50,15 @@
       "presentation": {
         "focus": true
       }
+    },
+    {
+      "type": "npm",
+      "script": "perf",
+      "problemMatcher": [],
+      "label": "npm: perf",
+      "presentation": {
+        "focus": true
+      }
     }
   ]
 }
