@@ -325,4 +325,48 @@ describe(`${MemongoDatabase.name}`, function () {
       expect(db.collection("users")).to.exist;
     });
   });
+
+  it("cannot guarantee the final persisted state if persistence writes do not preserve call order", async () => {
+    let writeCount = 0;
+    let persistedData: DatabaseContent = {};
+
+    const persistence = {
+      readDatabaseContentFunc: async () => JSONObjectOps.clone(persistedData),
+
+      writeDatabaseContentFunc: async (
+        memoryJSONDB: DatabaseContent,
+        resolve: () => void,
+        reject: (reason?: unknown) => void,
+      ) => {
+        try {
+          writeCount++;
+          const currentWrite = writeCount;
+
+          const snapshot = JSONObjectOps.clone(memoryJSONDB);
+
+          await new Promise((r) =>
+            setTimeout(r, currentWrite === 1 ? 100 : 10),
+          );
+
+          persistedData = snapshot;
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      },
+    };
+
+    const db = new MemongoDatabase(persistence, 10);
+
+    await db.init();
+
+    db.createCollection("users");
+    db.collection("users")!.add({ _id: "0", name: "old" });
+    await new Promise((r) => setTimeout(r, 20));
+    db.collection("users")!.update({ name: "new" });
+
+    await db.flush();
+
+    expect(persistedData).to.deep.equal({ users: { "0": { name: "old" } } });
+  });
 });
