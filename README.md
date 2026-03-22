@@ -18,12 +18,12 @@ By delegating persistence to user-defined read/write functions, Memongo stays fu
 
 ## ✨ Features
 
-- 🧠 MongoDB-like query syntax via `command`
-- 🔄 Chainable API for filtering, sorting, pagination
-- 💾 Pluggable persistence (Node.js, browser, wechat-miniprogram, custom)
-- ⚡ Lightweight (in-memory by default)
-- 🧩 Works in both TypeScript and JavaScript
-- 🕒 No dependencies
+- 🧠 In-memory JSON database with MongoDB-like API
+- 🔄 Atomic in-memory operations with deferred persistence
+- 🔌 Pluggable persistence (Node.js, browser, wechat-miniprogram, custom)
+- ⚡ Lightweight and fast
+- 🔤 Works in both TypeScript and JavaScript
+- 📦 No dependencies
 
 ## 📦 Installation
 
@@ -86,6 +86,23 @@ async function main() {
 
 await main();
 ```
+
+## ⚙️ Persistence Model
+
+Write operations apply changes to the in-memory state **synchronously**.
+
+If persistence is configured, data is written **asynchronously in the background**.
+
+To ensure all pending persistence operations are completed, call:
+
+```ts
+await db.flush();
+```
+
+Persistence-related errors are not thrown during write operations.
+They are reported when calling flush().
+
+➡️ See [this example](./examples/usage/async-persistence-and-flush.ts) for detailed usage.
 
 ## 📚 Documentation
 
