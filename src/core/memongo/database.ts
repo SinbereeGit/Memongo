@@ -50,6 +50,7 @@ export class MemongoDatabase implements Database, CollectionRoot {
 
   async flush(): Promise<void> {
     await Promise.all(this._pendingWrites);
+    this._pendingWrites = [];
     if (this._errorsRecord.length > 0) {
       const errors = this._errorsRecord;
       this._errorsRecord = [];
