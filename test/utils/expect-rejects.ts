@@ -1,19 +1,27 @@
 import { expect } from "chai";
 
 /**
- * @warning Call it with `await`!
+ * @remarks
+ * **This function must be called with `await`.**
+ * 
+ * Primarily designed for async functions (returning a Promise),
+ * but also works with synchronous functions which are expected to throw errors.
  */
 export async function expectRejects(
-  fn: () => Promise<unknown>,
+  fn: () => Promise<unknown> | unknown,
   errorClass?: new (...args: any[]) => Error,
 ): Promise<unknown> {
   try {
-    await fn();
-    expect.fail("Expected promise to reject");
+    const result = fn();
+    if (result instanceof Promise) {
+      await result;
+    }
   } catch (error) {
     if (errorClass) {
       expect(error).to.be.instanceOf(errorClass);
     }
     return error;
   }
+
+  expect.fail("Expects promise to reject (or sync function to throw)");
 }

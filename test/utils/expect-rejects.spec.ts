@@ -23,10 +23,15 @@ describe(`${expectRejects.name}`, function () {
   });
 
   it("fails when promise resolves", async function () {
+    let hasFailed = false;
+
     try {
       await expectRejects(() => Promise.resolve(void 0));
-      expect.fail("Expected promise to reject");
-    } catch {}
+    } catch {
+      hasFailed = true;
+    }
+
+    if (!hasFailed) expect.fail("Should fail when promise resolves");
   });
 
   it("verifies error class when specified", async function () {
@@ -34,10 +39,31 @@ describe(`${expectRejects.name}`, function () {
   });
 
   it("fails when error class does not match", async function () {
+    let hasFailed = false;
     try {
       await expectRejects(() => Promise.reject(new Error()), CustomError);
-      expect.fail("Expected promise to reject with error of type CustomError");
-    } catch {}
+    } catch {
+      hasFailed = true;
+    }
+    if (!hasFailed) expect.fail("Should fail when error class does not match");
+  });
+
+  it("fails when synchronous function does not throw", async function () {
+    let failCount = 0;
+    try {
+      await expectRejects(() => {});
+    } catch {
+      failCount += 1;
+    }
+
+    try {
+      await expectRejects(() => 1);
+    } catch {
+      failCount += 1;
+    }
+
+    if (failCount !== 2)
+      expect.fail("Should fail when synchronous function does not throw");
   });
 
   it("handles synchronous errors thrown by function", async function () {
@@ -51,11 +77,15 @@ describe(`${expectRejects.name}`, function () {
       throw new CustomError();
     }, CustomError);
 
+    let hasFailed = false;
     try {
       await expectRejects(() => {
         throw new Error();
       }, CustomError);
-      expect.fail("Expected promise to reject with error of type CustomError");
-    } catch {}
+    } catch {
+      hasFailed = true;
+    }
+    if (!hasFailed)
+      expect.fail("Should fail when synchronous function throws error of wrong class");
   });
 });
