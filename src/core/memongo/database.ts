@@ -20,7 +20,7 @@ export class MemongoDatabase implements Database, CollectionRoot {
   _debounceDelay: number;
   _isPureMemoryMode: boolean = false;
   _persistence: Persistence;
-  _pendingWrites: Promise<void>[] = [];
+  _lastPendingWrite: Promise<void> = Promise.resolve();
   _errorsRecord: Error[] = [];
 
   /**
@@ -49,8 +49,8 @@ export class MemongoDatabase implements Database, CollectionRoot {
   }
 
   async flush(): Promise<void> {
-    await Promise.all(this._pendingWrites);
-    this._pendingWrites = [];
+    await this._lastPendingWrite;
+    this._lastPendingWrite = Promise.resolve();
     if (this._errorsRecord.length > 0) {
       const errors = this._errorsRecord;
       this._errorsRecord = [];
@@ -63,7 +63,7 @@ export class MemongoDatabase implements Database, CollectionRoot {
    * Schedules an asynchronous persistence write for the current database state.
    */
   write(): void {
-    this._pendingWrites.push(this._writeToPersistance());
+    this._lastPendingWrite = this._writeToPersistance();
   }
 
   /**

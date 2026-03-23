@@ -327,8 +327,9 @@ describe(`${MemongoDatabase.name}`, function () {
   });
 
   it("cannot guarantee the final persisted state if persistence writes do not preserve call order", async () => {
-    let writeCount = 0;
+    let dataToApply: DatabaseContent = {};
     let persistedData: DatabaseContent = {};
+    let writeCount = 0;
 
     const persistence = {
       readDatabaseContentFunc: async () => JSONObjectOps.clone(persistedData),
@@ -341,14 +342,12 @@ describe(`${MemongoDatabase.name}`, function () {
         try {
           writeCount++;
           const currentWrite = writeCount;
-
           const snapshot = JSONObjectOps.clone(memoryJSONDB);
 
-          await new Promise((r) =>
-            setTimeout(r, currentWrite === 1 ? 100 : 10),
-          );
+          await new Promise((r) => setTimeout(r, currentWrite === 1 ? 20 : 0));
+          dataToApply = snapshot;
 
-          persistedData = snapshot;
+          persistedData = dataToApply;
           resolve();
         } catch (e) {
           reject(e);
@@ -362,11 +361,11 @@ describe(`${MemongoDatabase.name}`, function () {
 
     db.createCollection("users");
     db.collection("users")!.add({ _id: "0", name: "old" });
-    await new Promise((r) => setTimeout(r, 20));
+    await new Promise((r) => setTimeout(r, 15));
     db.collection("users")!.update({ name: "new" });
 
     await db.flush();
-
+    await new Promise((r) => setTimeout(r, 20));
     expect(persistedData).to.deep.equal({ users: { "0": { name: "old" } } });
   });
 });
