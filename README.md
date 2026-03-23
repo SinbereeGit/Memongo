@@ -4,11 +4,7 @@
 
 # Memongo
 
-![license](https://img.shields.io/badge/license-MIT-blue)
-![javascript](https://img.shields.io/badge/language-JavaScript-yellow)
-![repo size](https://img.shields.io/github/repo-size/SinbereeGit/memongo)
 ![npm version](https://img.shields.io/npm/v/memongo)
-![stars](https://img.shields.io/github/stars/SinbereeGit/memongo)
 
 </div>
 
