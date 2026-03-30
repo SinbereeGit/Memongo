@@ -115,7 +115,7 @@ export const JSONObjectOps = {
    * @throws Propagates errors thrown by {@link setByPath}.
    */
   update(obj: JSONObject, update: JSONUpdate): void {
-    for (const key in update) {
+    for (const key of Object.keys(update)) {
       const patch = update[key];
       if (patch === undefined) continue;
 

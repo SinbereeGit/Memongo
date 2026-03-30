@@ -93,7 +93,7 @@ export class MemongoCollection implements Collection, DocumentRoot {
       if (condition && typeof condition === "object") {
         if (!isJSONContainer(value)) return false;
 
-        for (const key in condition) {
+        for (const key of Object.keys(condition)) {
           if (
             !match(
               (value as JSONObject)[key],
@@ -112,7 +112,7 @@ export class MemongoCollection implements Collection, DocumentRoot {
     };
 
     const testDoc = (key: string): boolean => {
-      for (const keyInConditions in conditions) {
+      for (const keyInConditions of Object.keys(conditions)) {
         const docValueUnderTest =
           keyInConditions === "_id"
             ? key
