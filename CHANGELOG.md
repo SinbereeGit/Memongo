@@ -1,6 +1,14 @@
 # Changelog
 
-## 2.0.1
+## 2.0.2
+
+### Patch Changes
+
+- **Publish**: Included missing build artifacts in the npm package. The previous version (2.0.1) was published incorrectly due to a missing pre-publish build step. This release contains the same code as 2.0.1 but with the correct distribution files.
+
+## 2.0.1 [YANKED]
+
+> **Warning**: This version was published without running the build script hence the same as 2.0.0. Please upgrade to 2.0.2.
 
 ### Patch Changes
 
