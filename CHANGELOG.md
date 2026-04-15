@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.0.1
+
+### Patch Changes
+
+- fix: correct collection.where(...).remove() filtering and add regression test
+
 ## 2.0.0
 
 ### Major Changes
