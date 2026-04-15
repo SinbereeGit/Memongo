@@ -30,6 +30,7 @@ import {
 import { isJSONContainer } from "../json/json-guards.js";
 import { JSONObjectOps } from "../json/json-object-ops.js";
 import { MemongoQueryCommand } from "./query-command.js";
+import { createStrictView } from "../../utils/createStrictView.js";
 
 export class MemongoCollection implements Collection, DocumentRoot {
   _root: CollectionRoot;
@@ -123,13 +124,13 @@ export class MemongoCollection implements Collection, DocumentRoot {
       return true;
     };
 
-    const res: CollectionContent = {};
+    const keys: string[] = [];
 
-    Object.keys(this._content).forEach(
-      (key) => testDoc(key) && (res[key] = this._content[key]!),
-    );
+    Object.keys(this._content).forEach((key) => testDoc(key) && keys.push(key));
 
-    return new MemongoCollection(this._root, res, this._queryOptions);
+    const view = createStrictView(this._content, keys);
+
+    return new MemongoCollection(this._root, view, this._queryOptions);
   }
 
   limit(limit: number): Collection {
