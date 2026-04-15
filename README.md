@@ -122,7 +122,8 @@ Usage Examples:
 
 ## ⚠️ Notes
 
-ESM only → use `import`
+- ESM only → use `import`
+- The package is compiled to ES2022.
 
 ## 🧱 Limitations
 
