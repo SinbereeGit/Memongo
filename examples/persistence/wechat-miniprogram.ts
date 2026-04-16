@@ -79,4 +79,4 @@ async function main() {
   console.log(res);
 }
 
-await main();
+main();

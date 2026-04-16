@@ -51,4 +51,4 @@ async function main() {
 	console.log("After doc.update:", users.doc(aliceId).get());
 }
 
-await main();
+main();

@@ -38,4 +38,4 @@ async function main() {
 	console.log(`page ${page} / size ${pageSize}, total=${total}:`, pageData);
 }
 
-await main();
+main();

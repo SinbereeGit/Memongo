@@ -45,4 +45,4 @@ async function main() {
 	console.log("After collection.remove:", todos.get());
 }
 
-await main();
+main();

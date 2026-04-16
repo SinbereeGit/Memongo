@@ -37,4 +37,4 @@ async function main() {
 	console.log("role exists:", withRole);
 }
 
-await main();
+main();

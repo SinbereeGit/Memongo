@@ -152,4 +152,4 @@ async function main() {
   await demoFlushThrowsAggregatedErrorsContainMoreThanOneError();
 }
 
-await main();
+main();
