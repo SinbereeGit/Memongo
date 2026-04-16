@@ -17,7 +17,7 @@
     "perf": "cross-env TS_NODE_PROJECT=tsconfig.test.json node --import ./scripts/register-ts-node-esm.mjs ./test/performance/tmp.perf.ts",
     "docs": "typedoc",
     "changeset": "changeset",
-    "release:prepare": "changeset version"
+    "release:prepare": "changeset version && npm run build"
   },
   "keywords": [
     "database",
