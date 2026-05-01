@@ -1,35 +1,29 @@
-<div align="center">
-
-<img src="assets/logo.png" width="120" alt="Memongo Logo"/>
-
 # Memongo
 
 ![npm version](https://img.shields.io/npm/v/memongo)
-
-</div>
 
 **Memongo** is a lightweight in-memory JSON database with **MongoDB-like API** and **pluggable persistence**.
 
 By delegating persistence to user-defined read/write functions, Memongo stays fully environment-agnostic—working out of the box in environments including browsers, Node.js, and WeChat Mini Programs.
 
-## ✨ Features
+## Features
 
-- 🧠 In-memory JSON database with MongoDB-like API
-- 🔄 Atomic in-memory operations with deferred persistence
-- 🔌 Pluggable persistence (Node.js, browser, wechat-miniprogram, custom)
-- ⚡ Lightweight and fast
-- 🔤 Works in both TypeScript and JavaScript
-- 📦 No dependencies
+- **In-memory JSON database** with MongoDB-like API
+- **Atomic operations** with deferred persistence
+- **Pluggable persistence** (Node.js, browser, wechat-miniprogram, custom)
+- **Lightweight and fast**
+- **TypeScript & JavaScript support**
+- **No dependencies**
 
-## 📦 Installation
+## Installation
 
 ```bash
 npm install memongo
 ```
 
-## 🚀 Quick Start
+## Quick Start
 
-> 💡 All [examples] in this repository are written in TypeScript,
+> All [examples] in this repository are written in TypeScript,
 > but they work in JavaScript **without any changes**.
 
 ```typescript
@@ -83,7 +77,7 @@ async function main() {
 main();
 ```
 
-## ⚙️ Persistence Model
+## Persistence Model
 
 Write operations apply changes to the in-memory state **synchronously**.
 
@@ -98,11 +92,11 @@ await db.flush();
 Persistence-related errors are not thrown during write operations.
 They are reported when calling flush().
 
-➡️ See [this example](./examples/usage/async-persistence-and-flush.ts) for detailed usage.
+See [this example](./examples/usage/async-persistence-and-flush.ts) for detailed usage.
 
-## 📚 Documentation
+## Documentation
 
-👉 [Full API documentation](https://sinbereegit.github.io/Memongo/)
+[Full API documentation](https://sinbereegit.github.io/Memongo/)
 
 Usage Examples:
 
@@ -111,33 +105,33 @@ Usage Examples:
 - Update commands
 - Custom persistence (node, browser, wechat-miniprogram)
 
-➡️ See [examples]
+See [examples]
 
-## 🌍 Environment Support
+## Environment Support
 
-- ✅ Node.js
-- ✅ Browser
-- ✅ WeChat Mini Program
-- ✅ Any JavaScript runtime (via adapter)
+- Node.js
+- Browser
+- WeChat Mini Program
+- Any JavaScript runtime (via adapter)
 
-## ⚠️ Notes
+## Notes
 
 - ESM only → use `import`
 - The package is compiled to ES2022.
 
-## 🧱 Limitations
+## Limitations
 
 - The entire database is rewritten during persistence
 - Not suitable for large datasets
 - No indexing support yet
 
-## 🙏 Acknowledgements
+## Acknowledgements
 
 Thanks to the following open-source projects:
 
 - [MpLocalDB](https://github.com/jin-yufeng/MpLocalDB)
 
-## 📄 License
+## License
 
 [MIT](./LICENSE)
 
